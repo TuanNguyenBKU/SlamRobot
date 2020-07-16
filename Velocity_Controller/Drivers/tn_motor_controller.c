@@ -36,6 +36,9 @@ float floRightIn = 0;
 int32_t i32LeftPreError = 0;
 int32_t i32RightPreError = 0;
 
+volatile brk_t LeftStopFlag = FLOAT;
+volatile brk_t RightStopFlag = FLOAT;
+
 //*****************************************************************************
 //
 // This function handle the QEI0 Interrupt. This interruption occur when the
@@ -87,14 +90,18 @@ void QEI0TimerIntHandler()
     //
     // Specify the Direction.
     //
-    if (i32PWMValue >= 0)
+    if ((i32PWMValue >= 0) && (LeftStopFlag == FLOAT))
     {
         DirCtrl(LEFT, FORWARD);
     }
-    else
+    else if ((i32PWMValue < 0) && (LeftStopFlag == FLOAT))
     {
         DirCtrl(LEFT, BACKWARD);
         i32PWMValue = -i32PWMValue;
+    }
+    else if (LeftStopFlag == BREAK)
+    {
+        DirCtrl(LEFT, STOP);
     }
 
     //
@@ -154,14 +161,18 @@ void QEI1TimerIntHandler()
     //
     // Specify the Direction.
     //
-    if (i32PWMValue >= 0)
+    if ((i32PWMValue >= 0) && (RightStopFlag == FLOAT))
     {
         DirCtrl(RIGHT, FORWARD);
     }
-    else
+    else if ((i32PWMValue < 0) && (RightStopFlag == FLOAT))
     {
         DirCtrl(RIGHT, BACKWARD);
         i32PWMValue = -i32PWMValue;
+    }
+    else if (RightStopFlag == BREAK)
+    {
+        DirCtrl(RIGHT, STOP);
     }
 
     //
@@ -274,27 +285,30 @@ void MotorControl(motor_t MotorIndex, int32_t i32Veloc)
     case LEFT:
         if (i32Veloc == 0)
         {
-            DirCtrl(LEFT, STOP);
+            LeftStopFlag = BREAK;
         }
         else
         {
-            i32LeftPreError = 0;
-            floLeftIn = 0;
-            i32LeftSetVel = i32Veloc;
+            LeftStopFlag = FLOAT;
         }
+
+        i32LeftPreError = 0;
+        floLeftIn = 0;
+        i32LeftSetVel = i32Veloc;
         break;
 
     case RIGHT:
         if (i32Veloc == 0)
         {
-            DirCtrl(RIGHT, STOP);
+            RightStopFlag = BREAK;
         }
         else
         {
-            i32RightPreError = 0;
-            floRightIn = 0;
-            i32RightSetVel = i32Veloc;
+            RightStopFlag = FLOAT;
         }
+        i32RightPreError = 0;
+        floRightIn = 0;
+        i32RightSetVel = i32Veloc;
         break;
     }
 }
