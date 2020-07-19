@@ -1,0 +1,11 @@
+#!/bin/bash
+
+PROJ_DIR=`pwd`
+
+cw
+
+catkin_make rosserial_tivac_test_veloc_controller_veloc_controller.axf
+
+catkin_make rosserial_tivac_test_veloc_controller_flash
+
+cd $PROJ_DIR

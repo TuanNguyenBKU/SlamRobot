@@ -226,9 +226,15 @@ rosserial_add_client_target(vel_sub vel_sub.axf ALL)
 rosserial_add_client_target(vel_sub flash)
 rosserial_add_client_target(vel_sub size)
 
+# Veloc_Controller
+rosserial_configure_client(
+  DIRECTORY veloc_controller
+  TOOLCHAIN_FILE ${ROSSERIAL_TIVAC_TOOLCHAIN}
+)
 
-
-
+rosserial_add_client_target(veloc_controller veloc_controller.axf ALL)
+rosserial_add_client_target(veloc_controller flash)
+rosserial_add_client_target(veloc_controller size)
 
 
 
